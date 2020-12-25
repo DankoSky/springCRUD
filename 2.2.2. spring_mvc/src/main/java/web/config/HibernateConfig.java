@@ -14,25 +14,26 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
+import java.util.Objects;
 import java.util.Properties;
 
 
 @Configuration
-@PropertySource("classpath:db.properties")
+@PropertySource("classpath:src/main/resources/db.properties")
 @EnableTransactionManagement
 @ComponentScan(value = "web")
-public class HiberConfig {
+public class HibernateConfig {
 
     private final Environment env;
     @Autowired
-    public HiberConfig(Environment env) {
+    public HibernateConfig(Environment env) {
         this.env = env;
     }
 
     @Bean
     public DataSource getDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(env.getProperty("db.driver"));
+        dataSource.setDriverClassName(Objects.requireNonNull(env.getProperty("db.driver")));
         dataSource.setUrl(env.getProperty("db.url"));
         dataSource.setUsername(env.getProperty("db.username"));
         dataSource.setPassword(env.getProperty("db.password"));

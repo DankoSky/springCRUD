@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name ="users")
+@Table(name = "users")
 public class User {
 
     @Id
@@ -18,11 +18,11 @@ public class User {
 
     @Column
     @NotEmpty(message = "Name should not empty")
-    @Size(min = 2,max = 30, message = "Name is not valid")
+    @Size(min = 2, max = 30, message = "Name is not valid")
     private String name;
 
     @Column
-    @Min(value = 0,message = "Age should be greater than 0")
+    @Min(value = 0, message = "Age should be greater than 0")
     private int age;
 
     public User() {
@@ -59,5 +59,12 @@ public class User {
         this.age = age;
     }
 
-
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                '}';
+    }
 }
