@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>LK.Moderator </title>
+</head>
+<body>
+<p th:text="${user.getId()}">VALUE</p>
+<p th:text="${user.getName()}">VALUE</p>
+<p th:text="${user.getAge()}">VALUE</p>
+
+<a th:href="@{/WEB-INF/pages/moderator/show_moderator.html/{id}/edit(id=${user.getId()})}"><button>Edit</button></a>
+<br>
+<br>
+
+<br>
+<form th:action="@{/logout}" method="post">
+    <input type="submit" value="Sign Out"/>
+</form>
+</body>
+</html>
