@@ -3,10 +3,11 @@ package web.dao;
 import web.model.User;
 import java.util.List;
 
-public interface UserDao {
+public interface UserDao  {
     List<User> getAllUsers();
-    void save(User user);
+    boolean save(User user);
     User show(int id);
     void update(int id, User updatedUser);
     void delete(int id);
+    User findByUsername(String username);
 }

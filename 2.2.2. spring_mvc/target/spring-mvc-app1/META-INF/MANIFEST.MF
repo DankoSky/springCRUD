@@ -2,4 +2,8 @@ Manifest-Version: 1.0
 Created-By: IntelliJ IDEA
 Built-By: Bublik
 Build-Jdk: version 15.0.1
+Implementation-Title: spring-mvc-app1 Maven Webapp
+Implementation-Version: 1.0-SNAPSHOT
+Implementation-Vendor-Id: Spring_CRUD_2.4.2
+Main-Class: ${start-class}
 

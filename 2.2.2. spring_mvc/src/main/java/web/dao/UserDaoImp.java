@@ -1,11 +1,15 @@
 package web.dao;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
+import web.model.Role;
 import web.model.User;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Repository
@@ -22,10 +26,14 @@ public class UserDaoImp implements UserDao {
     }
 
     @Override
-    public void save(User user) {
-        entityManager.persist(user);
-
+    public boolean save(User user) {
+        if(user !=null){
+            entityManager.persist(user);
+            return true;
+        }
+        return false;
     }
+
 
     @Override
     public User show(int id) {
@@ -35,6 +43,11 @@ public class UserDaoImp implements UserDao {
     @Override
     public void delete(int id) {
         entityManager.remove(entityManager.find(User.class, id));
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        return entityManager.find(User.class, username);
     }
 
     @Override
