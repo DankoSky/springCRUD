@@ -9,18 +9,36 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import web.config.handler.LoginSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-   private final UserDetailsService userDetailsService;
-   private final LoginSuccessHandler loginSuccessHandler;
+
     @Autowired
-    public SecurityConfig(UserDetailsService userDetailsService, LoginSuccessHandler loginSuccessHandler){
-        this.userDetailsService = userDetailsService;
-        this.loginSuccessHandler = loginSuccessHandler;
+    private UserDetailsService userDetailsService;
+    @Autowired
+    private  LoginSuccessHandler loginSuccessHandler; // класс, в котором описана логика перенаправления пользователей по ролям
+
+
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+                    .antMatchers("/").hasAnyRole("ADMIN","USER")
+                    .antMatchers("/user/**").hasAnyRole("ADMIN", "USER")
+                    .antMatchers("/admin/**").hasRole("ADMIN")
+                   //                .antMatchers("/admin/**", "/hello").anonymous()
+                    .and()
+                .formLogin()
+                    .successHandler(loginSuccessHandler)
+                    .permitAll();
+        http.logout()
+                .permitAll()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"));
     }
 
     @Bean
@@ -28,27 +46,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests()
-                    .antMatchers("/","/login").permitAll()
-                    .anyRequest().authenticated()
-                .and()
-                    .formLogin()
-                    .loginPage("/login")
-                    .successHandler(new LoginSuccessHandler())
-                    .loginProcessingUrl("/login")
-                    .usernameParameter("username")
-                    .passwordParameter("password")
-                    .permitAll()
-                .and()
-                    .logout()
-                     .permitAll();
-    }
 
     @Autowired
     protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
+
     }
+//    @Bean
+//    public static NoOpPasswordEncoder passwordEncoder() {
+//        return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
+//    }
+//
+//
+//    @Override
+//    protected void configure( final AuthenticationManagerBuilder auth) throws Exception {
+//        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+//
+//    }
+
 }
+
+

@@ -4,12 +4,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
@@ -19,27 +15,32 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+
     @Column
-    @NotEmpty(message = "Name should not empty")
-    @Size(min = 2, max = 30, message = "Name is not valid")
     private String name;
     @Column
-    @Min(value = 0, message = "Age should be greater than 0")
     private int age;
     @Column
     private String password;
-    @Transient
-    transient private String confirmPassword;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )
-    private Set<Role> roles = new HashSet<>();
+    private Set<Role> roles= new LinkedHashSet<>();
 
     public User() {
+    }
+
+    public User(long id, String name, int age, String password, Set<Role> roles) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.password = password;
+        this.roles = roles;
     }
 
     public long getId() {
@@ -68,7 +69,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return getRoles();
     }
 
     @Override
@@ -105,13 +106,6 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
-
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
-    }
 
     public Set<Role> getRoles() {
         return roles;

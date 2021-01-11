@@ -1,5 +1,6 @@
 package web.config;
 
+import web.model.Role;
 import web.model.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ public class HibernateConfig {
         props.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
 
         factoryBean.setHibernateProperties(props);
-        factoryBean.setAnnotatedClasses(User.class );
+        factoryBean.setAnnotatedClasses(User.class, Role.class );
         return factoryBean;
     }
 

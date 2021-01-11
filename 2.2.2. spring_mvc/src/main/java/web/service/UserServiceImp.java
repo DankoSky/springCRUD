@@ -1,38 +1,29 @@
 package web.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import web.dao.RoleDao;
 import web.dao.UserDao;
 import web.model.Role;
 import web.model.User;
 
-import javax.persistence.Entity;
 import javax.transaction.Transactional;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @Transactional
-public class UserServiceImp implements UserService, UserDetailsService{
+public class UserServiceImp implements UserService {
 
-    private final UserDao userDao;
-    private final RoleDao roleDao;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private UserDao userDao;
 
-    public UserServiceImp(UserDao userDao, RoleDao roleDao, BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.userDao = userDao;
-        this.roleDao = roleDao;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
+    @Autowired
+    private RoleDao roleDao;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
 
     @Override
@@ -41,31 +32,26 @@ public class UserServiceImp implements UserService, UserDetailsService{
     }
 
     @Override
-    public boolean save(User user) {
-        User userFromDB = userDao.findByUsername(user.getUsername());
-
-        if (userFromDB != null) {
-            return false;
-        }
-
-        user.setRoles(Collections.singleton(new Role(1L, "ROLE_USER")));
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+    public void save(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userDao.save(user);
-        return true;
     }
 
+
+
     @Override
-    public User show(int id) {
+    public User show(long id) {
         return userDao.show(id);
     }
 
     @Override
-    public void update(int id, User updatedUser) {
+    public void update(long id, User updatedUser) {
+        updatedUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         userDao.update(id, updatedUser);
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(long id) {
         userDao.delete(id);
     }
 
@@ -75,12 +61,9 @@ public class UserServiceImp implements UserService, UserDetailsService{
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userDao.findByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-        return user;
+    public List<Role> getRoles() {
+        return roleDao.getRoles();
     }
+
 
 }
