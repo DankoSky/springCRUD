@@ -1,8 +1,11 @@
 package web.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import web.dao.RoleDao;
 import web.dao.UserDao;
+import web.model.Role;
 import web.model.User;
 
 import javax.transaction.Transactional;
@@ -12,12 +15,16 @@ import java.util.List;
 @Transactional
 public class UserServiceImp implements UserService {
 
-    private final UserDao userDao;
+    @Autowired
+    private UserDao userDao;
 
     @Autowired
-    public UserServiceImp(UserDao userDao) {
-        this.userDao = userDao;
-    }
+    private RoleDao roleDao;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
 
     @Override
     public List<User> getAllUsers() {
@@ -26,21 +33,37 @@ public class UserServiceImp implements UserService {
 
     @Override
     public void save(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userDao.save(user);
     }
 
+
+
     @Override
-    public User show(int id) {
+    public User show(long id) {
         return userDao.show(id);
     }
 
     @Override
-    public void update(int id, User updatedUser) {
+    public void update(long id, User updatedUser) {
+        updatedUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         userDao.update(id, updatedUser);
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(long id) {
         userDao.delete(id);
     }
+
+    @Override
+    public User findByUsername(String username) {
+        return userDao.findByUsername(username);
+    }
+
+    @Override
+    public List<Role> getRoles() {
+        return roleDao.getRoles();
+    }
+
+
 }
